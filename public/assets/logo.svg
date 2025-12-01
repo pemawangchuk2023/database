@@ -1,0 +1,36 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#f0f4f8" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- Main document stack -->
+  <g id="documents">
+    <!-- Bottom document (gray) -->
+    <rect x="55" y="95" width="90" height="55" rx="4" fill="#bdc3c7" stroke="#34495e" stroke-width="1.5"/>
+    <line x1="65" y1="110" x2="135" y2="110" stroke="#34495e" stroke-width="1"/>
+    <line x1="65" y1="125" x2="135" y2="125" stroke="#34495e" stroke-width="1"/>
+    
+    <!-- Middle document (light blue) -->
+    <rect x="50" y="80" width="90" height="55" rx="4" fill="#3498db" stroke="#2980b9" stroke-width="1.5"/>
+    <line x1="60" y1="95" x2="130" y2="95" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+    <line x1="60" y1="110" x2="130" y2="110" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+    
+    <!-- Top document (darker blue) -->
+    <rect x="45" y="65" width="90" height="55" rx="4" fill="#2980b9" stroke="#1a5276" stroke-width="1.5"/>
+    <line x1="55" y1="80" x2="125" y2="80" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
+    <line x1="55" y1="95" x2="125" y2="95" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
+  </g>
+  
+  <!-- Checkmark overlay -->
+  <g id="checkmark" transform="translate(130, 50)">
+    <circle cx="0" cy="0" r="18" fill="#27ae60" stroke="#229954" stroke-width="1.5"/>
+    <path d="M -8 0 L -2 6 L 8 -4" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Folder icon accent -->
+  <g id="folder-accent" transform="translate(65, 140)">
+    <path d="M 0 0 L 12 0 L 14 4 L 28 4 L 28 20 L 0 20 Z" fill="none" stroke="#e74c3c" stroke-width="1.5" opacity="0.7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="100" y="175" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#2c3e50" letter-spacing="1">DOCMANAGE</text>
+</svg>
