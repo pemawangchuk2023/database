@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, Search } from "lucide-react";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -14,8 +15,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function Header() {
+    const router = useRouter();
     return (
         <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
             {/* Search Bar */}
@@ -83,11 +88,31 @@ export function Header() {
                     <DropdownMenuContent align="end" className="w-56">
                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Profile</DropdownMenuItem>
-                        <DropdownMenuItem>Settings</DropdownMenuItem>
-                        <DropdownMenuItem>Activity Log</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/settings?tab=profile" className="cursor-pointer">Profile</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/settings?tab=security" className="cursor-pointer">Settings</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/settings?tab=activity" className="cursor-pointer">Activity Log</Link>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">Log out</DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="text-destructive cursor-pointer"
+                            onClick={async () => {
+                                await authClient.signOut({
+                                    fetchOptions: {
+                                        onSuccess: () => {
+                                            toast.success("Logged out successfully");
+                                            router.push("/auth/login");
+                                        },
+                                    },
+                                });
+                            }}
+                        >
+                            Log out
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

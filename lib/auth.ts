@@ -1,0 +1,19 @@
+import { betterAuth } from "better-auth";
+
+export const auth = betterAuth({
+    emailAndPassword: {
+        enabled: true,
+    },
+    user: {
+        additionalFields: {
+            role: {
+                type: "string",
+                defaultValue: "staff",
+            },
+            department: {
+                type: "string",
+                required: false,
+            },
+        },
+    },
+});

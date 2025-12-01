@@ -11,8 +11,11 @@ import {
     Settings,
     Users,
     FileBarChart,
+    LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -27,6 +30,7 @@ const navigation = [
 
 export function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
 
     return (
         <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-sidebar transition-transform">
@@ -69,7 +73,7 @@ export function Sidebar() {
                 </nav>
 
                 {/* Footer */}
-                <div className="border-t border-border p-4">
+                <div className="border-t border-border p-4 space-y-4">
                     <div className="rounded-lg bg-accent/50 p-3">
                         <p className="text-xs font-medium text-accent-foreground">Storage Used</p>
                         <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-background/50">
@@ -77,6 +81,22 @@ export function Sidebar() {
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">2.4 GB of 4 GB</p>
                     </div>
+
+                    <button
+                        onClick={async () => {
+                            await authClient.signOut({
+                                fetchOptions: {
+                                    onSuccess: () => {
+                                        router.push("/auth/login");
+                                    },
+                                },
+                            });
+                        }}
+                        className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-all duration-300 ease-in-out hover:bg-destructive/10 hover:text-destructive"
+                    >
+                        <LogOut className="h-5 w-5 flex-shrink-0 " />
+                        <span>Log Out</span>
+                    </button>
                 </div>
             </div>
         </aside>
