@@ -46,7 +46,7 @@ CREATE TABLE Documents (
     file_name VARCHAR(255) NOT NULL,
     file_size BIGINT NOT NULL,
     file_type VARCHAR(100) NOT NULL,
-    file_path TEXT NOT NULL,
+    file_data BYTEA NOT NULL,
     category_id INT REFERENCES Categories(category_id) ON DELETE SET NULL,
     type VARCHAR(255) NOT NULL,
     access_level VARCHAR(50) DEFAULT 'internal' CHECK (access_level IN ('public', 'internal', 'confidential')),
