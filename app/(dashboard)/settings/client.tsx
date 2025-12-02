@@ -43,7 +43,6 @@ const SettingsClient = ({ user, logs }: SettingsClientProps) => {
 
         if (result.success) {
             toast.success("Password changed successfully");
-            // Optional: reset form
         } else {
             toast.error(result.error || "Failed to change password");
         }
@@ -134,7 +133,7 @@ const SettingsClient = ({ user, logs }: SettingsClientProps) => {
                                     </div>
                                 </div>
                                 <div className="flex justify-end">
-                                    <Button type="submit" disabled={isLoading}>
+                                    <Button type="submit" disabled={isLoading} className='rounded-none cursor-pointer'>
                                         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                         Update Password
                                     </Button>
