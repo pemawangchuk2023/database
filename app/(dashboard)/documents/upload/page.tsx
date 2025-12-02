@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, FileText, X, CheckCircle } from "lucide-react";
+import { Upload, FileText, X, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { mockDocumentTypes } from "@/types";
 import { toast } from "sonner";
+import { uploadDocument } from "@/actions/document.action";
 
 export default function UploadDocumentPage() {
     const [files, setFiles] = useState<File[]>([]);
@@ -71,14 +72,30 @@ export default function UploadDocumentPage() {
 
         setUploading(true);
 
-        // Simulate upload
-        setTimeout(() => {
-            setUploading(false);
+        try {
+            for (const file of files) {
+                const uploadFormData = new FormData();
+                uploadFormData.append("file", file);
+                uploadFormData.append("title", formData.title);
+                uploadFormData.append("description", formData.description);
+                uploadFormData.append("documentType", formData.documentType);
+                uploadFormData.append("category", formData.category);
+                uploadFormData.append("tags", formData.tags);
+                uploadFormData.append("accessLevel", formData.accessLevel);
+
+                const result = await uploadDocument(uploadFormData);
+
+                if (result.error) {
+                    toast.error(result.error);
+                    setUploading(false);
+                    return;
+                }
+            }
+
             toast.success("Document uploaded successfully!", {
                 description: `${files.length} file(s) uploaded to the system`,
             });
 
-            // Reset form
             setFiles([]);
             setFormData({
                 title: "",
@@ -88,14 +105,21 @@ export default function UploadDocumentPage() {
                 tags: "",
                 accessLevel: "internal",
             });
-        }, 2000);
+        } catch (error) {
+            toast.error("Failed to upload document");
+            console.error("Upload error:", error);
+        } finally {
+            setUploading(false);
+        }
     };
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500">
             {/* Page Header */}
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Upload Document</h1>
+                <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                    Upload Document
+                </h1>
                 <p className="text-muted-foreground mt-1">
                     Add new documents to the Ministry of Finance document management system
                 </p>
@@ -103,9 +127,12 @@ export default function UploadDocumentPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* File Upload Area */}
-                <Card className="bg-card/95 backdrop-blur-sm border shadow-lg">
+                <Card className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-2 shadow-lg hover:shadow-xl transition-shadow">
                     <CardHeader>
-                        <CardTitle>Select Files</CardTitle>
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                            <CardTitle>Select Files</CardTitle>
+                        </div>
                         <CardDescription>
                             Drag and drop files here or click to browse. Supported formats: PDF, DOC, DOCX, XLS, XLSX, Images
                         </CardDescription>
@@ -114,12 +141,12 @@ export default function UploadDocumentPage() {
                         <div
                             {...getRootProps()}
                             className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-all duration-300 ease-in-out ${isDragActive
-                                    ? "border-primary bg-primary/5"
-                                    : "border-border hover:border-primary/50 hover:bg-accent/50"
+                                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30"
+                                    : "border-border hover:border-blue-400 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20"
                                 }`}
                         >
                             <input {...getInputProps()} />
-                            <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                            <Upload className="h-12 w-12 mx-auto mb-4 text-blue-600 dark:text-blue-400" />
                             {isDragActive ? (
                                 <p className="text-lg font-medium">Drop the files here...</p>
                             ) : (
@@ -137,9 +164,11 @@ export default function UploadDocumentPage() {
                                 {files.map((file, index) => (
                                     <div
                                         key={index}
-                                        className="flex items-center gap-3 p-3 rounded-lg bg-accent/50 border border-border"
+                                        className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800"
                                     >
-                                        <FileText className="h-5 w-5 text-primary flex-shrink-0" />
+                                        <div className="p-2 bg-blue-500/10 rounded-lg">
+                                            <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                        </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium truncate">{file.name}</p>
                                             <p className="text-xs text-muted-foreground">
@@ -151,7 +180,7 @@ export default function UploadDocumentPage() {
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => removeFile(index)}
-                                            className="flex-shrink-0"
+                                            className="flex-shrink-0 hover:bg-red-100 dark:hover:bg-red-950/30"
                                         >
                                             <X className="h-4 w-4" />
                                         </Button>
@@ -163,7 +192,7 @@ export default function UploadDocumentPage() {
                 </Card>
 
                 {/* Document Details */}
-                <Card className="bg-card/95 backdrop-blur-sm border shadow-lg">
+                <Card className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-2 shadow-lg">
                     <CardHeader>
                         <CardTitle>Document Details</CardTitle>
                         <CardDescription>Provide information about the document</CardDescription>
@@ -179,6 +208,7 @@ export default function UploadDocumentPage() {
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 required
+                                className="border-2"
                             />
                         </div>
 
@@ -190,6 +220,7 @@ export default function UploadDocumentPage() {
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 rows={4}
+                                className="border-2"
                             />
                         </div>
 
@@ -203,7 +234,7 @@ export default function UploadDocumentPage() {
                                     onValueChange={(value) => setFormData({ ...formData, documentType: value })}
                                     required
                                 >
-                                    <SelectTrigger id="documentType">
+                                    <SelectTrigger id="documentType" className="border-2">
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -223,6 +254,7 @@ export default function UploadDocumentPage() {
                                     placeholder="e.g., Financial Reports"
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    className="border-2"
                                 />
                             </div>
                         </div>
@@ -235,6 +267,7 @@ export default function UploadDocumentPage() {
                                     placeholder="e.g., budget, 2024, quarterly"
                                     value={formData.tags}
                                     onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                                    className="border-2"
                                 />
                                 <p className="text-xs text-muted-foreground">Separate tags with commas</p>
                             </div>
@@ -245,7 +278,7 @@ export default function UploadDocumentPage() {
                                     value={formData.accessLevel}
                                     onValueChange={(value) => setFormData({ ...formData, accessLevel: value })}
                                 >
-                                    <SelectTrigger id="accessLevel">
+                                    <SelectTrigger id="accessLevel" className="border-2">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -263,7 +296,7 @@ export default function UploadDocumentPage() {
                 <div className="flex gap-4">
                     <Button
                         type="submit"
-                        className="flex-1 gap-2 shadow-lg"
+                        className="flex-1 gap-2 shadow-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 hover:shadow-xl hover:scale-105"
                         disabled={uploading}
                     >
                         {uploading ? (
@@ -273,12 +306,17 @@ export default function UploadDocumentPage() {
                             </>
                         ) : (
                             <>
-                                <CheckCircle className="h-4 w-4" />
+                                <Upload className="h-4 w-4" />
                                 Upload Document
                             </>
                         )}
                     </Button>
-                    <Button type="button" variant="outline" disabled={uploading}>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        disabled={uploading}
+                        className="border-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                    >
                         Cancel
                     </Button>
                 </div>
