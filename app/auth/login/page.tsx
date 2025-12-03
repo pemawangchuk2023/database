@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { authClient } from "@/lib/auth-client";
 import { login as loginAction } from "@/actions/auth";
 import z from "zod"
 import { useRouter } from "next/navigation";

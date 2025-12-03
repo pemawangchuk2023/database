@@ -32,9 +32,10 @@ import { createCategory, updateCategory, deleteCategory } from "@/actions/catego
 interface CategoriesClientProps {
     categories: any[];
     stats: any;
+    userRole: "admin" | "staff";
 }
 
-export default function CategoriesClient({ categories, stats }: CategoriesClientProps) {
+export default function CategoriesClient({ categories, stats, userRole }: CategoriesClientProps) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -145,13 +146,15 @@ export default function CategoriesClient({ categories, stats }: CategoriesClient
                         Organize and manage document types and categories
                     </p>
                 </div>
-                <Button
-                    onClick={() => setIsCreateOpen(true)}
-                    className="gap-2 shadow-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 hover:shadow-xl hover:scale-105"
-                >
-                    <Plus className="h-4 w-4" />
-                    New Category
-                </Button>
+                {userRole === "admin" && (
+                    <Button
+                        onClick={() => setIsCreateOpen(true)}
+                        className="gap-2 shadow-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 hover:shadow-xl hover:scale-105"
+                    >
+                        <Plus className="h-4 w-4" />
+                        New Category
+                    </Button>
+                )}
             </div>
 
             {/* Stats Overview */}
@@ -215,24 +218,26 @@ export default function CategoriesClient({ categories, stats }: CategoriesClient
                                     <div className={`flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${colorClass} shadow-lg`}>
                                         <FolderOpen className="h-7 w-7 text-white" />
                                     </div>
-                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            className="h-8 w-8 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600"
-                                            onClick={() => openEditDialog(category)}
-                                        >
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            className="h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/20 text-destructive hover:text-red-600"
-                                            onClick={() => openDeleteDialog(category)}
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
+                                    {userRole === "admin" && (
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                className="h-8 w-8 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600"
+                                                onClick={() => openEditDialog(category)}
+                                            >
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                className="h-8 w-8 hover:bg-red-50 dark:hover:bg-red-900/20 text-destructive hover:text-red-600"
+                                                onClick={() => openDeleteDialog(category)}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">

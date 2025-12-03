@@ -99,3 +99,40 @@ export function parseTags(tagsString?: string): string[] {
     .map((tag) => tag.trim())
     .filter(Boolean);
 }
+
+/**
+ * Check if user is admin
+ */
+export async function isAdmin(userId: string): Promise<boolean> {
+  try {
+    const result = await pool.query(
+      "SELECT role FROM Users WHERE user_id = $1",
+      [userId]
+    );
+    return result.rows.length > 0 && result.rows[0].role === "admin";
+  } catch (error) {
+    console.error("Admin check error:", error);
+    return false;
+  }
+}
+
+/**
+ * Check if user can delete documents (admin only)
+ */
+export async function canDeleteDocument(userId: string): Promise<boolean> {
+  return isAdmin(userId);
+}
+
+/**
+ * Check if user can assign users (admin only)
+ */
+export async function canAssignUsers(userId: string): Promise<boolean> {
+  return isAdmin(userId);
+}
+
+/**
+ * Check if user can approve documents (admin only)
+ */
+export async function canApproveDocuments(userId: string): Promise<boolean> {
+  return isAdmin(userId);
+}

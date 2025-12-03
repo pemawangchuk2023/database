@@ -50,13 +50,22 @@ export async function getCategories(): Promise<ActionResponse> {
 }
 
 /**
- * Create a new category
+ * Create a new category (admin only)
  */
 export async function createCategory(formData: FormData): Promise<ActionResponse> {
     try {
         const session = await getSession();
         if (!session) {
             return { error: "Unauthorized" };
+        }
+
+        // Check if user is admin - only admins can create categories
+        const userResult = await pool.query(
+            "SELECT role FROM Users WHERE user_id = $1",
+            [session.userId]
+        );
+        if (userResult.rows.length === 0 || userResult.rows[0].role !== "admin") {
+            return { error: "Only administrators can create categories" };
         }
 
         const data = {
@@ -99,7 +108,7 @@ export async function createCategory(formData: FormData): Promise<ActionResponse
 }
 
 /**
- * Update a category
+ * Update a category (admin only)
  */
 export async function updateCategory(
     categoryId: string,
@@ -109,6 +118,15 @@ export async function updateCategory(
         const session = await getSession();
         if (!session) {
             return { error: "Unauthorized" };
+        }
+
+        // Check if user is admin - only admins can update categories
+        const userResult = await pool.query(
+            "SELECT role FROM Users WHERE user_id = $1",
+            [session.userId]
+        );
+        if (userResult.rows.length === 0 || userResult.rows[0].role !== "admin") {
+            return { error: "Only administrators can update categories" };
         }
 
         const data = {
@@ -148,13 +166,22 @@ export async function updateCategory(
 }
 
 /**
- * Delete a category
+ * Delete a category (admin only)
  */
 export async function deleteCategory(categoryId: string): Promise<ActionResponse> {
     try {
         const session = await getSession();
         if (!session) {
             return { error: "Unauthorized" };
+        }
+
+        // Check if user is admin - only admins can delete categories
+        const userResult = await pool.query(
+            "SELECT role FROM Users WHERE user_id = $1",
+            [session.userId]
+        );
+        if (userResult.rows.length === 0 || userResult.rows[0].role !== "admin") {
+            return { error: "Only administrators can delete categories" };
         }
 
         // Check if category has documents
