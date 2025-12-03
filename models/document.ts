@@ -15,6 +15,8 @@ export interface Document {
     tags: string[] | null;
     uploaded_by: number;
     downloads: number;
+    views: number;
+    status: "pending" | "approved" | "rejected";
     created_at: Date;
     updated_at: Date;
 }

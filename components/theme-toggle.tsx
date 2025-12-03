@@ -1,41 +1,21 @@
 "use client";
+import React from "react";
+import { useTheme } from "next-themes";
+import { Sun, Moon } from "lucide-react";
 
-import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+const ThemeToggle = () => {
+	const { theme, setTheme } = useTheme();
 
-export function ThemeToggle() {
-    const [theme, setTheme] = useState<"light" | "dark">("light");
+	return (
+		<button
+			onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+			className='relative p-2 hover:bg-gray-100 dark:hover:bg-[#1F1F23] rounded-full transition-colors'
+		>
+			<Sun className='h-5 w-5 text-gray-600 dark:text-gray-300 transition-all dark:hidden' />
+			<Moon className='h-5 w-5 text-gray-600 dark:text-gray-300 transition-all hidden dark:block' />
+			<span className='sr-only'>Toggle theme</span>
+		</button>
+	);
+};
 
-    useEffect(() => {
-        const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const initialTheme = savedTheme || (prefersDark ? "dark" : "light");
-
-        setTheme(initialTheme);
-        document.documentElement.classList.toggle("dark", initialTheme === "dark");
-    }, []);
-
-    const toggleTheme = () => {
-        const newTheme = theme === "light" ? "dark" : "light";
-        setTheme(newTheme);
-        localStorage.setItem("theme", newTheme);
-        document.documentElement.classList.toggle("dark", newTheme === "dark");
-    };
-
-    return (
-        <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="transition-all duration-300 ease-in-out"
-        >
-            {theme === "light" ? (
-                <Moon className="h-5 w-5" />
-            ) : (
-                <Sun className="h-5 w-5" />
-            )}
-            <span className="sr-only">Toggle theme</span>
-        </Button>
-    );
-}
+export default ThemeToggle;

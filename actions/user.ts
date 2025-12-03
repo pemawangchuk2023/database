@@ -52,13 +52,83 @@ export async function updateUserProfile(formData: FormData) {
             [validated.name, validated.email, session.userId]
         );
 
+        // Log the activity
+        await pool.query(
+            "INSERT INTO ActivityLogs (user_id, action, details) VALUES ($1, $2, $3)",
+            [session.userId, "PROFILE_UPDATE", `Updated profile information`]
+        );
+
         revalidatePath("/settings");
+        revalidatePath("/dashboard");
         return { success: true };
     } catch (error) {
         if (error instanceof z.ZodError) {
             return { error: error.errors[0].message };
         }
         return { error: "Failed to update profile" };
+    }
+}
+
+export async function updateProfilePhoto(photoData: string) {
+    const session = await getSession();
+    if (!session) return { error: "Unauthorized" };
+
+    try {
+        // Validate base64 image data
+        if (!photoData.startsWith("data:image/")) {
+            return { error: "Invalid image format" };
+        }
+
+        // Check file size (base64 is ~33% larger than binary, so 2MB binary ≈ 2.7MB base64)
+        const sizeInBytes = (photoData.length * 3) / 4;
+        const maxSize = 2 * 1024 * 1024; // 2MB
+
+        if (sizeInBytes > maxSize) {
+            return { error: "Image size must be less than 2MB" };
+        }
+
+        await pool.query(
+            "UPDATE Users SET image = $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2",
+            [photoData, session.userId]
+        );
+
+        // Log the activity
+        await pool.query(
+            "INSERT INTO ActivityLogs (user_id, action, details) VALUES ($1, $2, $3)",
+            [session.userId, "PROFILE_PHOTO_UPDATE", "Updated profile photo"]
+        );
+
+        revalidatePath("/settings");
+        revalidatePath("/dashboard");
+        return { success: true };
+    } catch (error) {
+        console.error("Update profile photo error:", error);
+        return { error: "Failed to update profile photo" };
+    }
+}
+
+export async function removeProfilePhoto() {
+    const session = await getSession();
+    if (!session) return { error: "Unauthorized" };
+
+    try {
+        await pool.query(
+            "UPDATE Users SET image = NULL, updated_at = CURRENT_TIMESTAMP WHERE user_id = $1",
+            [session.userId]
+        );
+
+        // Log the activity
+        await pool.query(
+            "INSERT INTO ActivityLogs (user_id, action, details) VALUES ($1, $2, $3)",
+            [session.userId, "PROFILE_PHOTO_REMOVE", "Removed profile photo"]
+        );
+
+        revalidatePath("/settings");
+        revalidatePath("/dashboard");
+        return { success: true };
+    } catch (error) {
+        console.error("Remove profile photo error:", error);
+        return { error: "Failed to remove profile photo" };
     }
 }
 
