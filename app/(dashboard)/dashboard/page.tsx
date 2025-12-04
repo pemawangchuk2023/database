@@ -158,50 +158,6 @@ const Dashboard = async () => {
 						</p>
 					</CardContent>
 				</Card>
-				{session?.role === "admin" && (
-					<Link href='/documents/pending'>
-						<Card className='group relative overflow-hidden border-l-4 border-l-blue-500 bg-gradient-to-br cursor-pointer'>
-							{/* Accent Lines */}
-							<div className='absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 to-blue-500' />
-							<div className='absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-blue-500 to-blue-500' />
-
-							{/* Pulse when pending */}
-							{pendingDocumentsCount > 0 && (
-								<div className='absolute inset-0 bg-gradient-to-r from-orange-400/10 to-amber-400/10 animate-pulse pointer-events-none' />
-							)}
-
-							<CardHeader className='flex flex-row items-center justify-between pb-3'>
-								<CardTitle className='text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-3'>
-									<span className='relative flex'>
-										<Clock className='h-5 w-5' />
-										{pendingDocumentsCount > 0 && (
-											<span className='absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-ping' />
-										)}
-									</span>
-									Pending Approval
-								</CardTitle>
-
-								<span className='px-3 py-1 text-sm font-bold text-white bg-gradient-to-r from-orange-600 to-amber-600 rounded-full shadow-md'>
-									{pendingDocumentsCount}
-								</span>
-							</CardHeader>
-
-							<CardContent className='pb-5'>
-								<p className='text-xs font-medium text-orange-600 dark:text-orange-400'>
-									{pendingDocumentsCount === 0
-										? "All documents approved"
-										: pendingDocumentsCount === 1
-											? "1 document needs review"
-											: `${pendingDocumentsCount} documents need review`}
-								</p>
-
-								<p className='mt-3 text-sm font-semibold text-orange-700 dark:text-orange-300 flex items-center gap-2 group-hover:gap-3 transition-all'>
-									Click to review →
-								</p>
-							</CardContent>
-						</Card>
-					</Link>
-				)}
 			</div>
 
 			{/* Recent Documents & Quick Actions */}
@@ -232,7 +188,22 @@ const Dashboard = async () => {
 
 				{/* Quick Actions & Alerts */}
 				<div className='space-y-6'>
-					<Card className='bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-2 shadow-lg'>
+					{/* Pending Approvals */}
+					{session?.role === "admin" && (
+						<Link href='/documents/pending'>
+							<div className='flex items-center justify-between p-4 rounded-lg border-2 border-emerald-500/50 dark:border-emerald-500/60 bg-white/50 dark:bg-slate-900/50 hover:border-emerald-500 dark:hover:border-emerald-400 transition-colors cursor-pointer'>
+								<div className='flex items-center gap-2'>
+									<Clock className='h-5 w-5 text-emerald-600 dark:text-emerald-400' />
+									<span className='font-medium text-gray-900 dark:text-white text-sm'>Pending Approvals</span>
+								</div>
+								<span className='px-2.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/50 rounded-full'>
+									{pendingDocumentsCount}
+								</span>
+							</div>
+						</Link>
+					)}
+
+					<Card className='bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-2 shadow-lg mt-2'>
 						<CardHeader>
 							<CardTitle className='flex items-center gap-2'>
 								<Sparkles className='h-5 w-5 text-purple-600 dark:text-purple-400' />

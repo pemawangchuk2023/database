@@ -32,6 +32,7 @@ export async function getAllUsers(): Promise<ActionResponse> {
         u.image,
         u.created_at,
         u.updated_at,
+        u.department_id,
         d.name as department_name
       FROM Users u
       LEFT JOIN Department d ON u.department_id = d.department_id

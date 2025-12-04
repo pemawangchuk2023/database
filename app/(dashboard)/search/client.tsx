@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, FileText, Calendar, Tag, User } from "lucide-react";
 import {
 	Card,
@@ -14,11 +14,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
+import PaginationComponent from "@/components/shared/pagination-component";
+import Link from "next/link";
 
 interface SearchClientProps {
 	documents: any[];
 	documentTypes: any[];
 }
+
 const SearchClient = ({ documents, documentTypes }: SearchClientProps) => {
 	const [filters, setFilters] = useState({
 		query: "",
@@ -26,6 +29,15 @@ const SearchClient = ({ documents, documentTypes }: SearchClientProps) => {
 		accessLevel: "",
 	});
 
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 4;
+
+	// ✅ Reset page when filters change
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [filters]);
+
+	// ✅ Properly filtered documents
 	const filteredDocuments = documents.filter((doc) => {
 		const matchesQuery =
 			!filters.query ||
@@ -37,11 +49,18 @@ const SearchClient = ({ documents, documentTypes }: SearchClientProps) => {
 
 		const matchesType =
 			!filters.documentType || doc.type === filters.documentType;
+
 		const matchesAccess =
 			!filters.accessLevel || doc.access_level === filters.accessLevel;
 
 		return matchesQuery && matchesType && matchesAccess;
 	});
+
+	// ✅ Pagination Logic
+	const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
+	const startIndex = (currentPage - 1) * itemsPerPage;
+	const endIndex = startIndex + itemsPerPage;
+	const currentDocuments = filteredDocuments.slice(startIndex, endIndex);
 
 	const getAccessLevelColor = (level: string) => {
 		switch (level) {
@@ -68,91 +87,100 @@ const SearchClient = ({ documents, documentTypes }: SearchClientProps) => {
 	};
 
 	return (
-		<div className='space-y-6 animate-in fade-in duration-500'>
+		<div className="space-y-6 animate-in fade-in duration-500">
 			{/* Page Header */}
 			<div>
-				<h1 className='text-3xl font-bold tracking-tight'>Advanced Search</h1>
-				<p className='text-muted-foreground mt-1'>
+				<h1 className="text-3xl font-bold tracking-tight">Advanced Search</h1>
+				<p className="text-muted-foreground mt-1">
 					Search and filter documents with advanced criteria
 				</p>
 			</div>
 
 			{/* Search Filters */}
-			<Card className='bg-card/95 backdrop-blur-sm border shadow-lg'>
+			<Card className="bg-card/95 backdrop-blur-sm border shadow-lg">
 				<CardHeader>
-					<div className='flex items-center justify-between'>
-						<div>
-							<CardTitle>Search Filters</CardTitle>
-							<CardDescription>
-								Refine your search with multiple criteria
-							</CardDescription>
-						</div>
+					<div>
+						<CardTitle>Search Filters</CardTitle>
+						<CardDescription>
+							Refine your search with multiple criteria
+						</CardDescription>
 					</div>
 				</CardHeader>
-				<CardContent className='space-y-4'>
-					{/* Main Search */}
-					<div className='space-y-2'>
-						<Label htmlFor='search'>Search Query</Label>
-						<div className='relative'>
-							<Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+
+				<CardContent className="space-y-4">
+					{/* Search Input */}
+					<div className="space-y-2">
+						<Label htmlFor="search">Search Query</Label>
+						<div className="relative">
+							<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 							<Input
-								id='search'
-								placeholder='Search by title, description, or tags...'
+								id="search"
+								placeholder="Search by title, description, or tags..."
 								value={filters.query}
 								onChange={(e) =>
 									setFilters({ ...filters, query: e.target.value })
 								}
-								className='pl-10'
+								className="pl-10"
 							/>
 						</div>
 					</div>
 
 					{/* Active Filters */}
 					{(filters.query || filters.documentType || filters.accessLevel) && (
-						<div className='flex flex-wrap gap-2 pt-4 border-t border-border'>
-							<span className='text-sm text-muted-foreground'>
+						<div className="flex flex-wrap gap-2 pt-4 border-t border-border">
+							<span className="text-sm text-muted-foreground">
 								Active filters:
 							</span>
+
 							{filters.query && (
-								<Badge variant='secondary' className='gap-1'>
+								<Badge variant="secondary" className="gap-1">
 									Query: {filters.query}
 									<button
-										onClick={() => setFilters({ ...filters, query: "" })}
-										className='ml-1 hover:text-destructive'
+										onClick={() =>
+											setFilters({ ...filters, query: "" })
+										}
+										className="ml-1 hover:text-destructive"
 									>
 										×
 									</button>
 								</Badge>
 							)}
+
 							{filters.documentType && (
-								<Badge variant='secondary' className='gap-1'>
+								<Badge variant="secondary" className="gap-1">
 									Type: {getDocumentTypeName(filters.documentType)}
 									<button
-										onClick={() => setFilters({ ...filters, documentType: "" })}
-										className='ml-1 hover:text-destructive'
+										onClick={() =>
+											setFilters({ ...filters, documentType: "" })
+										}
+										className="ml-1 hover:text-destructive"
 									>
 										×
 									</button>
 								</Badge>
 							)}
+
 							{filters.accessLevel && (
-								<Badge variant='secondary' className='gap-1'>
+								<Badge variant="secondary" className="gap-1">
 									Access: {filters.accessLevel}
 									<button
-										onClick={() => setFilters({ ...filters, accessLevel: "" })}
-										className='ml-1 hover:text-destructive'
+										onClick={() =>
+											setFilters({ ...filters, accessLevel: "" })
+										}
+										className="ml-1 hover:text-destructive"
 									>
 										×
 									</button>
 								</Badge>
 							)}
+
 							<Button
-								variant='ghost'
-								size='sm'
+								variant="ghost"
+								size="sm"
 								onClick={() =>
 									setFilters({ query: "", documentType: "", accessLevel: "" })
 								}
-								className='h-6 px-2 text-xs'
+								className="h-6 px-2 text-xs"
 							>
 								Clear all
 							</Button>
@@ -161,11 +189,11 @@ const SearchClient = ({ documents, documentTypes }: SearchClientProps) => {
 				</CardContent>
 			</Card>
 
-			{/* Results */}
-			<div className='flex items-center justify-between'>
-				<p className='text-sm text-muted-foreground'>
+			{/* Results Count */}
+			<div className="flex items-center justify-between">
+				<p className="text-sm text-muted-foreground">
 					Found{" "}
-					<span className='font-medium text-foreground'>
+					<span className="font-medium text-foreground">
 						{filteredDocuments.length}
 					</span>{" "}
 					documents
@@ -173,80 +201,94 @@ const SearchClient = ({ documents, documentTypes }: SearchClientProps) => {
 			</div>
 
 			{/* Search Results */}
-			<div className='space-y-3'>
-				{filteredDocuments.map((doc, index) => (
-					<Card
-						key={doc.document_id}
-						className='transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-card/95 backdrop-blur-sm border shadow-lg cursor-pointer'
-						style={{ animationDelay: `${index * 50}ms` }}
-					>
-						<CardContent className='p-6'>
-							<div className='flex items-start gap-4'>
-								<div className='flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary flex-shrink-0'>
-									<FileText className='h-6 w-6' />
-								</div>
-								<div className='flex-1 min-w-0'>
-									<div className='flex items-start justify-between gap-4 mb-2'>
-										<h3 className='font-semibold text-lg'>{doc.title}</h3>
-										<Badge
-											variant='outline'
-											className={getAccessLevelColor(doc.access_level)}
-										>
-											{doc.access_level}
-										</Badge>
+			<div className="space-y-3">
+				{currentDocuments.map((doc, index) => (
+					<Link key={doc.document_id}
+						href={`/documents/${doc.document_id}`}
+						className="block">
+						<Card
+							className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl bg-card/95 backdrop-blur-sm border shadow-lg cursor-pointer"
+							style={{ animationDelay: `${index * 50}ms` }}
+						>
+							<CardContent className="p-6">
+								<div className="flex items-start gap-4">
+									<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+										<FileText className="h-6 w-6" />
 									</div>
-									<p className='text-sm text-muted-foreground mb-3 line-clamp-2'>
-										{doc.description || "No description"}
-									</p>
-									<div className='flex flex-wrap items-center gap-3 text-sm text-muted-foreground'>
-										<div className='flex items-center gap-1'>
-											<FileText className='h-3.5 w-3.5' />
-											<Badge variant='secondary' className='text-xs'>
-												{getDocumentTypeName(doc.type)}
+
+									<div className="flex-1 min-w-0">
+										<div className="flex justify-between mb-2">
+											<h3 className="font-semibold text-lg">{doc.title}</h3>
+											<Badge
+												variant="outline"
+												className={getAccessLevelColor(doc.access_level)}
+											>
+												{doc.access_level}
 											</Badge>
 										</div>
-										<div className='flex items-center gap-1'>
-											<User className='h-3.5 w-3.5' />
-											<span>{doc.uploader_name || "Unknown"}</span>
-										</div>
-										<div className='flex items-center gap-1'>
-											<Calendar className='h-3.5 w-3.5' />
-											<span>
+
+										<p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+											{doc.description || "No description"}
+										</p>
+
+										<div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+											<Badge variant="secondary" className="text-xs">
+												{getDocumentTypeName(doc.type)}
+											</Badge>
+
+											<div className="flex items-center gap-1">
+												<User className="h-3.5 w-3.5" />
+												{doc.uploader_name || "Unknown"}
+											</div>
+
+											<div className="flex items-center gap-1">
+												<Calendar className="h-3.5 w-3.5" />
 												{formatDistanceToNow(new Date(doc.created_at), {
 													addSuffix: true,
 												})}
-											</span>
-										</div>
-										<div className='flex items-center gap-1'>
+											</div>
+
 											<span>{formatFileSize(doc.file_size)}</span>
 										</div>
-									</div>
-									{doc.tags && doc.tags.length > 0 && (
-										<div className='flex flex-wrap items-center gap-2 mt-3'>
-											<Tag className='h-3.5 w-3.5 text-muted-foreground' />
-											{doc.tags.map((tag: string, i: number) => (
-												<Badge key={i} variant='outline' className='text-xs'>
-													{tag}
-												</Badge>
-											))}
-										</div>
-									)}
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-				))}
 
+										{doc.tags?.length > 0 && (
+											<div className="flex flex-wrap items-center gap-2 mt-3">
+												<Tag className="h-3.5 w-3.5 text-muted-foreground" />
+												{doc.tags.map((tag: string, i: number) => (
+													<Badge key={i} variant="outline" className="text-xs">
+														{tag}
+													</Badge>
+												))}
+											</div>
+										)}
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+					</Link>
+				))}
 				{filteredDocuments.length === 0 && (
-					<Card className='bg-card/95 backdrop-blur-sm border shadow-lg'>
-						<CardContent className='p-12 text-center'>
-							<Search className='h-12 w-12 mx-auto mb-4 text-muted-foreground' />
-							<h3 className='text-lg font-semibold mb-2'>No documents found</h3>
-							<p className='text-sm text-muted-foreground'>
+					<Card>
+						<CardContent className="p-12 text-center">
+							<Search className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+							<h3 className="text-lg font-semibold mb-2">
+								No documents found
+							</h3>
+							<p className="text-sm text-muted-foreground">
 								Try adjusting your search criteria or filters
 							</p>
 						</CardContent>
 					</Card>
+				)}
+
+				{totalPages > 1 && (
+					<div className="flex justify-center pt-6">
+						<PaginationComponent
+							currentPage={currentPage}
+							totalPages={totalPages}
+							onPageChange={setCurrentPage}
+						/>
+					</div>
 				)}
 			</div>
 		</div>

@@ -75,7 +75,7 @@ const DashboardDocuments = ({
 									</Badge>
 								)}
 							</div>
-							<div className='flex items-center gap-3 text-xs text-muted-foreground'>
+							<div className='flex items-center gap-3 text-xs text-amber-500 font-bold italic'>
 								<span>{doc.uploader_name || "Unknown"}</span>
 								<span>•</span>
 								<span>

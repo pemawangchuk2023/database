@@ -1,18 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Poppins, Space_Grotesk } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const poppins = Poppins({
+const inter = Inter({
 	subsets: ["latin"],
-	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 	variable: "--font-inter",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const jetbrainsMono = JetBrains_Mono({
 	subsets: ["latin"],
-	weight: ["300", "400", "500", "600", "700"],
-	variable: "--font-spaceGrotesk",
+	variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -30,7 +28,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<body className={`${poppins.variable} ${spaceGrotesk.variable}`}>
+			<body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
 				<ThemeProvider
 					attribute='class'
 					defaultTheme='dark'
