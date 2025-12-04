@@ -237,8 +237,8 @@ const DocumentsDashboard = async () => {
                     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
                         <Link href="/documents/upload">
                             <Button
-                                variant="outline"
-                                className="w-full h-auto flex-col gap-3 p-6 border-2 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:border-blue-300 dark:hover:border-blue-700 transition-all hover:shadow-lg hover:-translate-y-1"
+                                variant="destructive"
+                                className="w-full h-auto cursor-pointer rounded-none flex-col gap-3 p-6 border-4 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:border-blue-300 dark:hover:border-blue-700 transition-all hover:shadow-lg hover:-translate-y-1"
                             >
                                 <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl shadow-lg">
                                     <Upload className="h-6 w-6 text-white" />

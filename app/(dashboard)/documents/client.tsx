@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileText, Grid, List, Download, Trash2, Eye } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { deleteDocument } from "@/actions/document.action";
 import { useRouter } from "next/navigation";
+import PaginationComponent from "@/components/shared/pagination-component";
 
 interface DocumentsClientProps {
 	documents: any[];
@@ -54,14 +55,30 @@ const DocumentsClient = ({
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedType, setSelectedType] = useState<string>("all");
 	const [documents, setDocuments] = useState(initialDocuments);
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 4;
 
 	const filteredDocuments = documents.filter((doc) => {
 		const matchesSearch =
 			doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			doc.description?.toLowerCase().includes(searchQuery.toLowerCase());
-		const matchesType = selectedType === "all" || doc.type === selectedType;
+
+		// Convert both values to strings for comparison to handle numeric and string types
+		const docType = String(doc.type).toLowerCase();
+		const filterType = String(selectedType).toLowerCase();
+		const matchesType = selectedType === "all" || docType === filterType;
+
 		return matchesSearch && matchesType;
 	});
+
+	const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
+	const startIndex = (currentPage - 1) * itemsPerPage;
+	const endIndex = startIndex + itemsPerPage;
+	const paginatedDocuments = filteredDocuments.slice(startIndex, endIndex);
+
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [searchQuery, selectedType]);
 
 	const getAccessLevelColor = (level: string) => {
 		switch (level) {
@@ -238,7 +255,7 @@ const DocumentsClient = ({
 			{/* Documents Grid View */}
 			{viewMode === "grid" && filteredDocuments.length > 0 && (
 				<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-					{filteredDocuments.map((doc, index) => (
+					{paginatedDocuments.map((doc, index) => (
 						<Card
 							key={doc.document_id}
 							className='transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-card/95 backdrop-blur-sm border shadow-lg cursor-pointer group'
@@ -341,6 +358,15 @@ const DocumentsClient = ({
 					))}
 				</div>
 			)}
+			{totalPages > 1 && (
+				<div className='flex justify-center pt-6'>
+					<PaginationComponent
+						currentPage={currentPage}
+						totalPages={totalPages}
+						onPageChange={setCurrentPage}
+					/>
+				</div>
+			)}
 
 			{/* Documents List View */}
 			{viewMode === "list" && filteredDocuments.length > 0 && (
@@ -424,38 +450,40 @@ const DocumentsClient = ({
 											>
 												<Download className='h-4 w-4' />
 											</Button>
-											<AlertDialog>
-												<AlertDialogTrigger asChild>
-													<Button
-														size='icon'
-														variant='ghost'
-														className='text-destructive'
-													>
-														<Trash2 className='h-4 w-4' />
-													</Button>
-												</AlertDialogTrigger>
-												<AlertDialogContent>
-													<AlertDialogHeader>
-														<AlertDialogTitle>
-															Are you absolutely sure?
-														</AlertDialogTitle>
-														<AlertDialogDescription>
-															This action cannot be undone. This will
-															permanently delete the document "{doc.title}" from
-															the database.
-														</AlertDialogDescription>
-													</AlertDialogHeader>
-													<AlertDialogFooter>
-														<AlertDialogCancel>Cancel</AlertDialogCancel>
-														<AlertDialogAction
-															onClick={() => handleDelete(doc.document_id)}
-															className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+											{userRole.isAdmin && (
+												<AlertDialog>
+													<AlertDialogTrigger asChild>
+														<Button
+															size='icon'
+															variant='ghost'
+															className='text-destructive'
 														>
-															Delete
-														</AlertDialogAction>
-													</AlertDialogFooter>
-												</AlertDialogContent>
-											</AlertDialog>
+															<Trash2 className='h-4 w-4' />
+														</Button>
+													</AlertDialogTrigger>
+													<AlertDialogContent>
+														<AlertDialogHeader>
+															<AlertDialogTitle>
+																Are you absolutely sure?
+															</AlertDialogTitle>
+															<AlertDialogDescription>
+																This action cannot be undone. This will
+																permanently delete the document "{doc.title}"
+																from the database.
+															</AlertDialogDescription>
+														</AlertDialogHeader>
+														<AlertDialogFooter>
+															<AlertDialogCancel>Cancel</AlertDialogCancel>
+															<AlertDialogAction
+																onClick={() => handleDelete(doc.document_id)}
+																className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+															>
+																Delete
+															</AlertDialogAction>
+														</AlertDialogFooter>
+													</AlertDialogContent>
+												</AlertDialog>
+											)}
 										</div>
 									</TableCell>
 								</TableRow>

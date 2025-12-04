@@ -28,14 +28,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { createCategory, updateCategory, deleteCategory } from "@/actions/category.action";
+import PaginationComponent from "@/components/shared/pagination-component";
 
 interface CategoriesClientProps {
     categories: any[];
     stats: any;
     userRole: "admin" | "staff";
 }
-
-export default function CategoriesClient({ categories, stats, userRole }: CategoriesClientProps) {
+const CategoriesClient = ({ categories, stats, userRole }: CategoriesClientProps) => {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -46,6 +46,15 @@ export default function CategoriesClient({ categories, stats, userRole }: Catego
         description: "",
     });
     const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 4
+    const totalPages = Math.ceil(categories.length / itemsPerPage);
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    const paginatedCategories = categories.slice(startIndex, endIndex);
+
 
     const handleCreate = async () => {
         if (!formData.name) {
@@ -204,7 +213,7 @@ export default function CategoriesClient({ categories, stats, userRole }: Catego
 
             {/* Categories Grid */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {categories.map((category, index) => {
+                {paginatedCategories.map((category, index) => {
                     const colorClass = categoryColors[index % categoryColors.length];
 
                     return (
@@ -259,7 +268,17 @@ export default function CategoriesClient({ categories, stats, userRole }: Catego
                         </Card>
                     );
                 })}
+
             </div>
+            {totalPages > 1 && (
+                <div className="flex justify-center pt-6">
+                    <PaginationComponent
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
+            )}
 
             {/* Create Dialog */}
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -375,3 +394,6 @@ export default function CategoriesClient({ categories, stats, userRole }: Catego
         </div>
     );
 }
+
+
+export default CategoriesClient

@@ -43,14 +43,13 @@ export default async function UsersPage() {
 						User Management
 					</h1>
 					<p className='text-gray-600 dark:text-gray-400 mt-1'>
-						{isAdmin ? "Manage system users and their permissions" : "View system users"}
+						{isAdmin
+							? "Manage system users and their permissions"
+							: "View system users"}
 					</p>
 				</div>
 				{isAdmin && (
-					<AddUserDialog
-						departments={departments}
-						isAdmin={isAdmin}
-					/>
+					<AddUserDialog departments={departments} isAdmin={isAdmin} />
 				)}
 			</div>
 

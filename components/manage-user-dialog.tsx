@@ -100,14 +100,14 @@ export function ManageUserDialog({ user, departments }: ManageUserDialogProps) {
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={setOpen} modal>
 			<DialogTrigger asChild>
 				<Button size='sm' variant='outline' className='border-2'>
 					<Settings className='h-4 w-4 mr-1' />
 					Edit
 				</Button>
 			</DialogTrigger>
-			<DialogContent className='sm:max-w-[500px]'>
+			<DialogContent className='sm:max-w-[600px]'>
 				<form onSubmit={handleSubmit}>
 					<DialogHeader>
 						<DialogTitle>Edit User</DialogTitle>

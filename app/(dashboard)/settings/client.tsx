@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	Card,
@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { updateUserProfile, changePassword } from "@/actions/user";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProfilePhotoUpload from "@/components/profile-photo-upload";
+import PaginationComponent from "@/components/shared/pagination-component";
 
 interface SettingsClientProps {
 	user: any;
@@ -29,6 +30,21 @@ const SettingsClient = ({ user, logs }: SettingsClientProps) => {
 	const searchParams = useSearchParams();
 	const defaultTab = searchParams.get("tab") || "profile";
 	const [isLoading, setIsLoading] = useState(false);
+
+	// Pagination Part
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 10;
+
+	const totalPages = Math.ceil(logs.length / itemsPerPage);
+	const startIndex = (currentPage - 1) * itemsPerPage;
+	const endIndex = startIndex + itemsPerPage;
+	const paginatedLogs = logs.slice(startIndex, endIndex);
+
+	// Reset to page 1 when logs change
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [logs]);
+
 
 	async function handleProfileUpdate(formData: FormData) {
 		setIsLoading(true);
@@ -208,17 +224,17 @@ const SettingsClient = ({ user, logs }: SettingsClientProps) => {
 				<TabsContent value='activity'>
 					<Card className='rounded-none border-2'>
 						<CardHeader>
-							<CardTitle>Activity Log</CardTitle>
+							<CardTitle className="text-center items-center justify-center text-amber-500">Activity Log</CardTitle>
 							<CardDescription>Recent activity on your account</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<div className='space-y-8'>
-								{logs.length === 0 ? (
+								{paginatedLogs.length === 0 ? (
 									<p className='text-center text-muted-foreground py-8'>
 										No recent activity found.
 									</p>
 								) : (
-									logs.map((log: any) => (
+									paginatedLogs.map((log: any) => (
 										<div key={log.log_id} className='flex items-center'>
 											<div className='space-y-1'>
 												<p className='text-sm font-medium leading-none'>
@@ -238,6 +254,16 @@ const SettingsClient = ({ user, logs }: SettingsClientProps) => {
 							</div>
 						</CardContent>
 					</Card>
+					{totalPages > 1 && (
+						<div className='pt-6'>
+							<PaginationComponent
+								currentPage={currentPage}
+								totalPages={totalPages}
+								onPageChange={setCurrentPage}
+							/>
+						</div>
+					)}
+
 				</TabsContent>
 			</Tabs>
 		</div>
