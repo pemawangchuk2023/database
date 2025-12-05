@@ -20,7 +20,7 @@
    DATABASE_HOST=localhost
    DATABASE_NAME=dms
    DATABASE_USER=postgres
-   DATABASE_PASSWORD="Pema@#2025"
+   DATABASE_PASSWORD=""
    ```
 
 3. **Initialize Database**
