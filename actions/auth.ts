@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { parseError } from "@/lib/errors";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -60,14 +61,15 @@ export async function register(prevState: AuthState, formData: FormData): Promis
         });
 
         return { success: true };
-    } catch (error: any) {
+    } catch (error) {
+        const message = parseError(error);
         console.error("Registration error:", error);
 
-        if (error.message?.includes("already exists") || error.message?.includes("unique") || error.message?.includes("duplicate")) {
+        if (message.includes("already exists") || message.includes("unique") || message.includes("duplicate")) {
             return { error: "User already exists with this email" };
         }
 
-        return { error: error.message || "Something went wrong. Please try again." };
+        return { error: message || "Something went wrong. Please try again." };
     }
 }
 
@@ -122,9 +124,9 @@ export async function login(prevState: AuthState, formData: FormData): Promise<A
         }
 
         return { success: true };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Login error:", error);
-        return { error: "Invalid email or password" };
+        return { error: parseError(error) };
     }
 }
 
@@ -200,9 +202,9 @@ export async function getPendingUsers(): Promise<ActionResponse> {
             success: true,
             data: result.rows,
         };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Get pending users error:", error);
-        return { error: "Failed to fetch pending users" };
+        return { error: parseError(error) };
     }
 }
 
@@ -246,9 +248,9 @@ export async function approveUser(userId: string): Promise<ActionResponse> {
             success: true,
             data: result.rows[0],
         };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Approve user error:", error);
-        return { error: "Failed to approve user" };
+        return { error: parseError(error) };
     }
 }
 
@@ -292,14 +294,14 @@ export async function rejectUser(userId: string): Promise<ActionResponse> {
             success: true,
             data: result.rows[0],
         };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Reject user error:", error);
-        return { error: "Failed to reject user" };
+        return { error: parseError(error) };
     }
 }
 
 type ActionResponse = {
     success?: boolean;
     error?: string;
-    data?: any;
+    data?: unknown;
 };
