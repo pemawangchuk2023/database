@@ -11,6 +11,7 @@ import { User, Lock, Activity, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { updateUserProfile, changePassword } from "@/actions/user";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ProfilePhotoUpload } from "@/components/profile-photo-upload";
 
 interface SettingsClientProps {
     user: any;
@@ -78,7 +79,14 @@ const SettingsClient = ({ user, logs }: SettingsClientProps) => {
                             <CardDescription>Update your personal details</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <form action={handleProfileUpdate} className="space-y-4">
+                            <form action={handleProfileUpdate} className="space-y-6">
+                                {/* Profile Photo Upload */}
+                                <ProfilePhotoUpload
+                                    currentPhoto={user?.image}
+                                    userName={user?.name || "User"}
+                                />
+
+                                <Separator />
                                 <div className="grid gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
                                         <Label htmlFor="name">Full Name</Label>

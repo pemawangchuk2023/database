@@ -246,8 +246,10 @@ export default function CategoriesClient({ categories, stats }: CategoriesClient
                                     <div className="flex items-center gap-2">
                                         <FileText className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm text-muted-foreground">
-                                            {category.document_count || 0} documents
+                                            {Number(category.document_count) || 0}{" "}
+                                            {Number(category.document_count) === 1 ? "Document" : "Documents"}
                                         </span>
+
                                     </div>
                                 </div>
                             </CardContent>

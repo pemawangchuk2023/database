@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { getDocumentStats, getRecentDocuments } from "@/actions/document.action";
 import { getUserProfile } from "@/actions/user";
+import { UserAvatar } from "@/components/user-avatar";
 
 export default async function DashboardPage() {
     // Fetch real data from database
@@ -38,18 +39,24 @@ export default async function DashboardPage() {
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Page Header */}
             <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                        Dashboard
-                    </h1>
-                    <p className="text-muted-foreground mt-1">
-                        Welcome back,
-                        <span className="ml-1 font-semibold text-green-600">
-                            {userProfile?.name || 'User'}
-                        </span>
-                        ! Here's an overview of your document management system.
-                    </p>
-
+                <div className="flex items-center gap-4">
+                    <UserAvatar
+                        name={userProfile?.name || 'User'}
+                        image={userProfile?.image}
+                        size="lg"
+                        className="ring-2 ring-blue-500/20"
+                    />
+                    <div>
+                        <h1 className="text-2xl font-bold">
+                            Welcome back,
+                            <span className="ml-2 text-green-600">
+                                {userProfile?.name || 'User'}
+                            </span>!
+                        </h1>
+                        <p className="text-muted-foreground mt-1">
+                            Here's an overview of your document management system.
+                        </p>
+                    </div>
                 </div>
                 <Link href="/documents/upload">
                     <Button className="gap-2 shadow-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 hover:shadow-xl hover:scale-105">
@@ -207,7 +214,7 @@ export default async function DashboardPage() {
 
                     <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 backdrop-blur-sm border-2 shadow-lg border-blue-200/50 dark:border-blue-800/50">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                            <CardTitle className="flex items-center gap-2 text-red-500 dark:text-red-300">
                                 <AlertCircle className="h-5 w-5" />
                                 System Info
                             </CardTitle>

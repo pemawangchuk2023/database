@@ -18,8 +18,10 @@ import {
 import { mockDocumentTypes } from "@/types";
 import { toast } from "sonner";
 import { uploadDocument } from "@/actions/document.action";
+import { useRouter } from "next/navigation";
 
 export default function UploadDocumentPage() {
+    const router = useRouter()
     const [files, setFiles] = useState<File[]>([]);
     const [uploading, setUploading] = useState(false);
     const [formData, setFormData] = useState({
@@ -95,7 +97,7 @@ export default function UploadDocumentPage() {
             toast.success("Document uploaded successfully!", {
                 description: `${files.length} file(s) uploaded to the system`,
             });
-
+            router.push("/dashboard")
             setFiles([]);
             setFormData({
                 title: "",
@@ -141,8 +143,8 @@ export default function UploadDocumentPage() {
                         <div
                             {...getRootProps()}
                             className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-all duration-300 ease-in-out ${isDragActive
-                                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30"
-                                    : "border-border hover:border-blue-400 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20"
+                                ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30"
+                                : "border-border hover:border-blue-400 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20"
                                 }`}
                         >
                             <input {...getInputProps()} />

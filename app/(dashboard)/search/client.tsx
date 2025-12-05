@@ -27,7 +27,7 @@ export default function SearchClient({ documents, documentTypes }: SearchClientP
         documentType: "",
         accessLevel: "",
     });
-    const [showAdvanced, setShowAdvanced] = useState(false);
+
 
     const filteredDocuments = documents.filter((doc) => {
         const matchesQuery = !filters.query ||
@@ -83,14 +83,6 @@ export default function SearchClient({ documents, documentTypes }: SearchClientP
                             <CardTitle>Search Filters</CardTitle>
                             <CardDescription>Refine your search with multiple criteria</CardDescription>
                         </div>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowAdvanced(!showAdvanced)}
-                        >
-                            <Filter className="h-4 w-4 mr-2" />
-                            {showAdvanced ? "Hide" : "Show"} Advanced
-                        </Button>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -109,48 +101,6 @@ export default function SearchClient({ documents, documentTypes }: SearchClientP
                         </div>
                     </div>
 
-                    {/* Advanced Filters */}
-                    {showAdvanced && (
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pt-4 border-t border-border">
-                            <div className="space-y-2">
-                                <Label htmlFor="documentType">Document Type</Label>
-                                <Select
-                                    value={filters.documentType}
-                                    onValueChange={(value) => setFilters({ ...filters, documentType: value })}
-                                >
-                                    <SelectTrigger id="documentType">
-                                        <SelectValue placeholder="All types" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="">All Types</SelectItem>
-                                        {documentTypes.map((type) => (
-                                            <SelectItem key={type.id} value={type.id}>
-                                                {type.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="accessLevel">Access Level</Label>
-                                <Select
-                                    value={filters.accessLevel}
-                                    onValueChange={(value) => setFilters({ ...filters, accessLevel: value })}
-                                >
-                                    <SelectTrigger id="accessLevel">
-                                        <SelectValue placeholder="All levels" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="">All Levels</SelectItem>
-                                        <SelectItem value="public">Public</SelectItem>
-                                        <SelectItem value="internal">Internal</SelectItem>
-                                        <SelectItem value="confidential">Confidential</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                    )}
 
                     {/* Active Filters */}
                     {(filters.query || filters.documentType || filters.accessLevel) && (

@@ -15,12 +15,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
-import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { getNotifications, getUnreadCount, markAsRead, markAllAsRead } from "@/actions/notification.action";
 import { formatDistanceToNow } from "date-fns";
+import { getUserProfile } from "@/actions/user";
+import { authClient } from "@/lib/auth-client";
 
 
 export function Header() {
@@ -45,13 +46,17 @@ export function Header() {
             setUnreadCount(countResult.data.count);
         }
     };
-
     const loadUser = async () => {
-        const session = await authClient.getSession();
-        if (session.data?.user) {
-            setUser(session.data.user);
+        try {
+            const profile = await getUserProfile();
+            if (profile) {
+                setUser(profile);
+            }
+        } catch (error) {
+            console.error("Failed to load user profile", error);
         }
     };
+
 
     const handleMarkAsRead = async (notificationId: string) => {
         await markAsRead(notificationId);
@@ -168,8 +173,9 @@ export function Header() {
                                 <span className="text-sm font-medium">
                                     {user?.name ? user.name.split(' ').slice(0, 2).join(' ') : 'User'}
                                 </span>
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
-                                    {user?.name || 'User'}
+
+                                <span className="text-xs text-gray-500">
+                                    {user?.email || 'User'}
                                 </span>
                             </div>
                         </Button>

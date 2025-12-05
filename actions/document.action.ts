@@ -88,12 +88,20 @@ export async function uploadDocument(
             ]
         );
 
+        const documentId = result.rows[0].document_id;
+
+        // Log the activity
+        await pool.query(
+            "INSERT INTO ActivityLogs (user_id, action, details) VALUES ($1, $2, $3)",
+            [session.userId, "DOCUMENT_UPLOAD", `Uploaded document: ${validated.title}`]
+        );
+
         revalidatePath("/documents");
         revalidatePath("/dashboard");
 
         return {
             success: true,
-            data: { documentId: result.rows[0].document_id },
+            data: { documentId },
         };
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -289,6 +297,12 @@ export async function updateDocument(
 
         await pool.query(query, params);
 
+        // Log the activity
+        await pool.query(
+            "INSERT INTO ActivityLogs (user_id, action, details) VALUES ($1, $2, $3)",
+            [session.userId, "DOCUMENT_UPDATE", `Updated document ID: ${id}`]
+        );
+
         revalidatePath("/documents");
         revalidatePath(`/documents/${id}`);
 
@@ -321,7 +335,20 @@ export async function deleteDocument(id: string): Promise<ActionResponse> {
             return { error: "You don't have permission to delete this document" };
         }
 
+        // Get document title before deletion for logging
+        const docResult = await pool.query(
+            "SELECT title FROM Documents WHERE document_id = $1",
+            [id]
+        );
+        const docTitle = docResult.rows[0]?.title || "Unknown";
+
         await pool.query("DELETE FROM Documents WHERE document_id = $1", [id]);
+
+        // Log the activity
+        await pool.query(
+            "INSERT INTO ActivityLogs (user_id, action, details) VALUES ($1, $2, $3)",
+            [session.userId, "DOCUMENT_DELETE", `Deleted document: ${docTitle}`]
+        );
 
         revalidatePath("/documents");
         revalidatePath("/dashboard");
@@ -414,6 +441,12 @@ export async function downloadDocument(id: string): Promise<ActionResponse> {
         }
 
         await incrementDownloadCount(id);
+
+        // Log the activity
+        await pool.query(
+            "INSERT INTO ActivityLogs (user_id, action, details) VALUES ($1, $2, $3)",
+            [session.userId, "DOCUMENT_DOWNLOAD", `Downloaded: ${result.rows[0].file_name}`]
+        );
 
         return {
             success: true,
