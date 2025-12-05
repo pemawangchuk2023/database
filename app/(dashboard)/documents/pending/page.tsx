@@ -1,7 +1,7 @@
 import { getPendingDocuments } from "@/actions/document.action";
 import { DocumentTypes } from "@/types";
 import PendingDocumentsClient from "./client";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/actions/auth";
 import { redirect } from "next/navigation";
 
 export default async function PendingDocumentsPage() {

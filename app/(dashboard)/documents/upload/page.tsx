@@ -25,6 +25,7 @@ import { DocumentTypes } from "@/types";
 import { toast } from "sonner";
 import { uploadDocument } from "@/actions/document.action";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const UploadDocument = () => {
 	const router = useRouter();
@@ -125,10 +126,10 @@ const UploadDocument = () => {
 	};
 
 	return (
-		<div className='max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500'>
+		<div className='max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500 cyber-grid min-h-screen p-6'>
 			{/* Page Header */}
 			<div>
-				<h1 className='text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent'>
+				<h1 className='text-3xl font-bold tracking-tight text-cyan-900 dark:text-cyan-100'>
 					Upload Document
 				</h1>
 				<p className='text-muted-foreground mt-1'>
@@ -139,7 +140,7 @@ const UploadDocument = () => {
 
 			<form onSubmit={handleSubmit} className='space-y-6'>
 				{/* File Upload Area */}
-				<Card className='bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-2 shadow-lg hover:shadow-xl transition-shadow'>
+				<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-cyan hover:neon-glow-cyan transition-shadow'>
 					<CardHeader>
 						<div className='flex items-center gap-2'>
 							<Sparkles className='h-5 w-5 text-blue-600 dark:text-blue-400' />
@@ -211,7 +212,7 @@ const UploadDocument = () => {
 				</Card>
 
 				{/* Document Details */}
-				<Card className='bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-2 shadow-lg'>
+				<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-purple hover:neon-glow-purple'>
 					<CardHeader>
 						<CardTitle>Document Details</CardTitle>
 						<CardDescription>
@@ -331,7 +332,7 @@ const UploadDocument = () => {
 				<div className='flex gap-4'>
 					<Button
 						type='submit'
-						className='flex-1 gap-2 shadow-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 hover:shadow-xl hover:scale-105'
+						className='flex-1 gap-2 shadow-lg bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 transition-all duration-300 hover:shadow-cyan-500/50 hover:scale-105 border border-cyan-500/30'
 						disabled={uploading}
 					>
 						{uploading ? (
@@ -346,14 +347,16 @@ const UploadDocument = () => {
 							</>
 						)}
 					</Button>
-					<Button
-						type='button'
-						variant='outline'
-						disabled={uploading}
-						className='border-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all'
-					>
-						Cancel
-					</Button>
+					<Link href='/dashboard'>
+						<Button
+							type='button'
+							variant='outline'
+							disabled={uploading}
+							className='border-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all'
+						>
+							Cancel
+						</Button>
+					</Link>
 				</div>
 			</form>
 		</div>

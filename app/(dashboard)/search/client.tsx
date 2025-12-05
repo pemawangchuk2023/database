@@ -87,7 +87,7 @@ const SearchClient = ({ documents, documentTypes }: SearchClientProps) => {
 	};
 
 	return (
-		<div className="space-y-6 animate-in fade-in duration-500">
+		<div className="space-y-6 animate-in fade-in duration-500 cyber-grid min-h-screen p-6">
 			{/* Page Header */}
 			<div>
 				<h1 className="text-3xl font-bold tracking-tight">Advanced Search</h1>
@@ -97,7 +97,7 @@ const SearchClient = ({ documents, documentTypes }: SearchClientProps) => {
 			</div>
 
 			{/* Search Filters */}
-			<Card className="bg-card/95 backdrop-blur-sm border shadow-lg">
+			<Card className="bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-cyan hover:neon-glow-cyan">
 				<CardHeader>
 					<div>
 						<CardTitle>Search Filters</CardTitle>
@@ -207,7 +207,7 @@ const SearchClient = ({ documents, documentTypes }: SearchClientProps) => {
 						href={`/documents/${doc.document_id}`}
 						className="block">
 						<Card
-							className="transition-all duration-300 hover:-translate-y-1 hover:shadow-xl bg-card/95 backdrop-blur-sm border shadow-lg cursor-pointer"
+							className="transition-all duration-300 hover:-translate-y-1 bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-magenta hover:neon-glow-magenta cursor-pointer"
 							style={{ animationDelay: `${index * 50}ms` }}
 						>
 							<CardContent className="p-6">

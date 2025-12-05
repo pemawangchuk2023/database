@@ -3,7 +3,7 @@
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import pool from "@/lib/db";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/actions/auth";
 import { revalidatePath } from "next/cache";
 
 const profileSchema = z.object({
@@ -24,11 +24,11 @@ export async function getUserProfile() {
     const session = await getSession();
     if (!session) return null;
 
+    // Query Better Auth user table which uses string IDs
     const result = await pool.query(
-        `SELECT u.user_id, u.name, u.email, u.role, u.image, d.name as department_name 
-         FROM Users u 
-         LEFT JOIN Department d ON u.department_id = d.department_id 
-         WHERE u.user_id = $1`,
+        `SELECT u.id as user_id, u.name, u.email, u.role, u.image, u.department as department_name 
+         FROM "user" u 
+         WHERE u.id = $1`,
         [session.userId]
     );
 
@@ -47,8 +47,9 @@ export async function updateUserProfile(formData: FormData) {
     try {
         const validated = profileSchema.parse(data);
 
+        // Update Better Auth user table
         await pool.query(
-            "UPDATE Users SET name = $1, email = $2, updated_at = CURRENT_TIMESTAMP WHERE user_id = $3",
+            'UPDATE "user" SET name = $1, email = $2, "updatedAt" = CURRENT_TIMESTAMP WHERE id = $3',
             [validated.name, validated.email, session.userId]
         );
 
@@ -87,8 +88,9 @@ export async function updateProfilePhoto(photoData: string) {
             return { error: "Image size must be less than 2MB" };
         }
 
+        // Update Better Auth user table
         await pool.query(
-            "UPDATE Users SET image = $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2",
+            'UPDATE "user" SET image = $1, "updatedAt" = CURRENT_TIMESTAMP WHERE id = $2',
             [photoData, session.userId]
         );
 
@@ -112,8 +114,9 @@ export async function removeProfilePhoto() {
     if (!session) return { error: "Unauthorized" };
 
     try {
+        // Update Better Auth user table
         await pool.query(
-            "UPDATE Users SET image = NULL, updated_at = CURRENT_TIMESTAMP WHERE user_id = $1",
+            'UPDATE "user" SET image = NULL, "updatedAt" = CURRENT_TIMESTAMP WHERE id = $1',
             [session.userId]
         );
 
@@ -141,8 +144,8 @@ export async function changePassword(formData: FormData) {
     try {
         const validated = passwordSchema.parse(data);
 
-        // Verify current password
-        const userResult = await pool.query("SELECT password FROM Users WHERE user_id = $1", [session.userId]);
+        // Verify current password from Better Auth account table
+        const userResult = await pool.query('SELECT password FROM "account" WHERE "userId" = $1 AND "providerId" = \'credential\'', [session.userId]);
         const user = userResult.rows[0];
 
         const isValid = await bcrypt.compare(validated.currentPassword, user.password);
@@ -153,8 +156,9 @@ export async function changePassword(formData: FormData) {
         // Hash new password
         const hashedPassword = await bcrypt.hash(validated.newPassword, 10);
 
+        // Update password in Better Auth account table
         await pool.query(
-            "UPDATE Users SET password = $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2",
+            'UPDATE "account" SET password = $1, "updatedAt" = CURRENT_TIMESTAMP WHERE "userId" = $2 AND "providerId" = \'credential\'',
             [hashedPassword, session.userId]
         );
 

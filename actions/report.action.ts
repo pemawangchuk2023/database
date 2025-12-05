@@ -1,7 +1,7 @@
 "use server";
 
 import pool from "@/lib/db";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/actions/auth";
 
 export async function getDocumentActivityStats() {
     const session = await getSession();

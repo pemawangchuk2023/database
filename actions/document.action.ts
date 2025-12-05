@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import pool from "@/lib/db";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/actions/auth";
 import { revalidatePath } from "next/cache";
 import { documentUploadSchema, documentUpdateSchema } from "@/models/document";
 import { validateFile, formatFileSize } from "@/lib/file-upload";

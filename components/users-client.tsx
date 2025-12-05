@@ -33,6 +33,8 @@ interface User {
 	updated_at: string;
 	department_id?: string | number;
 	department_name?: string;
+	status?: string;
+	approved_by?: string;
 }
 
 interface Department {
@@ -124,6 +126,30 @@ export function UsersClient({
 					</Badge>
 				</div>
 			);
+		}
+	};
+
+	const getAccountStatusBadge = (status?: string) => {
+		switch (status) {
+			case "pending":
+				return (
+					<Badge className='bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20'>
+						Pending
+					</Badge>
+				);
+			case "rejected":
+				return (
+					<Badge className='bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'>
+						Rejected
+					</Badge>
+				);
+			case "active":
+			default:
+				return (
+					<Badge className='bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20'>
+						Active
+					</Badge>
+				);
 		}
 	};
 
@@ -226,6 +252,7 @@ export function UsersClient({
 											</p>
 										</div>
 									)}
+									{getAccountStatusBadge(user.status)}
 									{getRoleBadge(user.role)}
 									{getStatusBadge(user.updated_at)}
 									<div className='text-right hidden lg:block flex-shrink-0'>
