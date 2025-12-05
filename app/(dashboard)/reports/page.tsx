@@ -187,7 +187,7 @@ export default function Report() {
 	};
 
 	return (
-		<div className='space-y-6 animate-in fade-in duration-500'>
+		<div className='space-y-6 animate-in fade-in duration-500 cyber-grid min-h-screen p-6'>
 			{/* Page Header */}
 			<div>
 				<h1 className='text-3xl font-bold tracking-tight'>
@@ -200,7 +200,7 @@ export default function Report() {
 
 			{/* Report Cards */}
 			<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-				<Card className='transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-card/95 backdrop-blur-sm border shadow-lg cursor-pointer'>
+				<Card className='transition-all duration-300 ease-in-out hover:-translate-y-1 bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-cyan hover:neon-glow-cyan cursor-pointer'>
 					<CardHeader>
 						<div className='flex items-center justify-between'>
 							<FileBarChart className='h-8 w-8 text-primary' />
@@ -227,7 +227,7 @@ export default function Report() {
 					</CardContent>
 				</Card>
 
-				<Card className='transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-card/95 backdrop-blur-sm border shadow-lg cursor-pointer'>
+				<Card className='transition-all duration-300 ease-in-out hover:-translate-y-1 bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-purple hover:neon-glow-purple cursor-pointer'>
 					<CardHeader>
 						<div className='flex items-center justify-between'>
 							<TrendingUp className='h-8 w-8 text-green-600' />
@@ -254,7 +254,7 @@ export default function Report() {
 					</CardContent>
 				</Card>
 
-				<Card className='transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-card/95 backdrop-blur-sm border shadow-lg cursor-pointer'>
+				<Card className='transition-all duration-300 ease-in-out hover:-translate-y-1 bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-magenta hover:neon-glow-magenta cursor-pointer'>
 					<CardHeader>
 						<div className='flex items-center justify-between'>
 							<Calendar className='h-8 w-8 text-blue-600' />
@@ -283,7 +283,7 @@ export default function Report() {
 			</div>
 
 			{/* Info Card */}
-			<Card className='bg-card/95 backdrop-blur-sm border shadow-lg'>
+			<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 border-purple-500/30 neon-glow-purple'>
 				<CardHeader>
 					<CardTitle>About Reports</CardTitle>
 				</CardHeader>

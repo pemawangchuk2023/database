@@ -6,9 +6,11 @@ import {
 	getAllDepartments,
 } from "@/actions/user.action";
 import { UsersClient } from "@/components/users-client";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/actions/auth";
 import { redirect } from "next/navigation";
 import AddUserDialog from "@/components/add-user-dialog";
+import { PendingUsersDialog } from "@/components/pending-users-dialog";
+import { getPendingUsers } from "@/actions/auth";
 
 export default async function UsersPage() {
 	// Get session to determine user role
@@ -23,9 +25,11 @@ export default async function UsersPage() {
 	const usersResult = await getAllUsers();
 	const statsResult = await getUserStats();
 	const departmentsResult = await getAllDepartments();
+	const pendingResult = isAdmin ? await getPendingUsers() : { data: [] };
 
 	const users = usersResult.success ? usersResult.data : [];
 	const departments = departmentsResult.success ? departmentsResult.data : [];
+	const pendingCount = pendingResult.success ? (pendingResult.data?.length || 0) : 0;
 	const stats = statsResult.success
 		? statsResult.data
 		: {
@@ -35,11 +39,11 @@ export default async function UsersPage() {
 		};
 
 	return (
-		<div className='space-y-6 animate-in fade-in duration-500'>
+		<div className='space-y-6 animate-in fade-in duration-500 cyber-grid min-h-screen p-6'>
 			{/* Page Header */}
 			<div className='flex items-center justify-between'>
 				<div>
-					<h1 className='text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent'>
+					<h1 className='text-3xl font-bold tracking-tight text-cyan-900 dark:text-cyan-100'>
 						User Management
 					</h1>
 					<p className='text-gray-600 dark:text-gray-400 mt-1'>
@@ -49,13 +53,16 @@ export default async function UsersPage() {
 					</p>
 				</div>
 				{isAdmin && (
-					<AddUserDialog departments={departments} isAdmin={isAdmin} />
+					<div className="flex gap-2">
+						<PendingUsersDialog pendingCount={pendingCount} />
+						<AddUserDialog departments={departments} isAdmin={isAdmin} />
+					</div>
 				)}
 			</div>
 
 			{/* Stats */}
 			<div className='grid gap-4 md:grid-cols-3'>
-				<Card className='bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-2 border-blue-200/50 dark:border-blue-800/50 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1'>
+				<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-cyan hover:neon-glow-cyan transition-all hover:-translate-y-1'>
 					<CardContent className='p-6'>
 						<div className='flex items-center gap-4'>
 							<div className='flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10'>
@@ -65,7 +72,7 @@ export default async function UsersPage() {
 								<p className='text-sm text-gray-600 dark:text-gray-400'>
 									Total Users
 								</p>
-								<p className='text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent'>
+								<p className='text-3xl font-bold text-cyan-600 dark:text-cyan-400'>
 									{stats.totalUsers}
 								</p>
 							</div>
@@ -73,7 +80,7 @@ export default async function UsersPage() {
 					</CardContent>
 				</Card>
 
-				<Card className='bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 border-2 border-red-200/50 dark:border-red-800/50 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1'>
+				<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-magenta hover:neon-glow-magenta transition-all hover:-translate-y-1'>
 					<CardContent className='p-6'>
 						<div className='flex items-center gap-4'>
 							<div className='flex h-12 w-12 items-center justify-center rounded-lg bg-red-500/10'>
@@ -83,7 +90,7 @@ export default async function UsersPage() {
 								<p className='text-sm text-gray-600 dark:text-gray-400'>
 									Administrators
 								</p>
-								<p className='text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent'>
+								<p className='text-3xl font-bold text-pink-600 dark:text-pink-400'>
 									{stats.totalAdmins}
 								</p>
 							</div>
@@ -91,7 +98,7 @@ export default async function UsersPage() {
 					</CardContent>
 				</Card>
 
-				<Card className='bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-2 border-green-200/50 dark:border-green-800/50 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1'>
+				<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-purple hover:neon-glow-purple transition-all hover:-translate-y-1'>
 					<CardContent className='p-6'>
 						<div className='flex items-center gap-4'>
 							<div className='flex h-12 w-12 items-center justify-center rounded-lg bg-green-500/10'>
@@ -101,7 +108,7 @@ export default async function UsersPage() {
 								<p className='text-sm text-gray-600 dark:text-gray-400'>
 									Staff Members
 								</p>
-								<p className='text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent'>
+								<p className='text-3xl font-bold text-purple-600 dark:text-purple-400'>
 									{stats.totalStaff}
 								</p>
 							</div>

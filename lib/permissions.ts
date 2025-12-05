@@ -105,8 +105,9 @@ export function parseTags(tagsString?: string): string[] {
  */
 export async function isAdmin(userId: string): Promise<boolean> {
   try {
+    // Query Better Auth user table which uses string IDs
     const result = await pool.query(
-      "SELECT role FROM Users WHERE user_id = $1",
+      'SELECT role FROM "user" WHERE id = $1',
       [userId]
     );
     return result.rows.length > 0 && result.rows[0].role === "admin";

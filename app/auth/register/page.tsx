@@ -24,7 +24,6 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { authClient } from "@/lib/auth-client";
 import { register as registerAction } from "@/actions/auth";
 
 const formSchema = z.object({
@@ -78,9 +77,11 @@ export default function RegisterPage() {
         const result = await registerAction({} as any, formData);
 
         if (result.success) {
-            toast.success("Account created successfully");
-            router.push("/dashboard");
-            router.refresh();
+            toast.success("Registration successful! Your account is pending admin approval.", {
+                description: "You will be notified once an administrator approves your account.",
+                duration: 6000,
+            });
+            router.push("/auth/login");
         } else {
             toast.error(result.error || "Something went wrong");
             setIsLoading(false);
@@ -98,7 +99,7 @@ export default function RegisterPage() {
                     </div>
                     <CardTitle className="text-2xl font-bold">Request Access</CardTitle>
                     <CardDescription>
-                        Create an account to access the Document Management System
+                        Register for access to the Document Management System. Your account will be reviewed by an administrator.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>

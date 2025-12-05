@@ -1,7 +1,7 @@
 "use server";
 
 import pool from "@/lib/db";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/actions/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -23,20 +23,21 @@ export async function getAllUsers(): Promise<ActionResponse> {
 			return { error: "Unauthorized" };
 		}
 
+		// Query Better Auth user table to get ALL users (including newly registered ones)
 		const result = await pool.query(`
       SELECT 
-        u.user_id,
+        u.id as user_id,
         u.name,
         u.email,
         u.role,
         u.image,
-        u.created_at,
-        u.updated_at,
-        u.department_id,
-        d.name as department_name
-      FROM Users u
-      LEFT JOIN Department d ON u.department_id = d.department_id
-      ORDER BY u.created_at DESC
+        u."createdAt" as created_at,
+        u."updatedAt" as updated_at,
+        u.department as department_name,
+        u.status,
+        u.approved_by
+      FROM "user" u
+      ORDER BY u."createdAt" DESC
     `);
 
 		return {
@@ -135,7 +136,7 @@ export async function createUser(formData: FormData): Promise<ActionResponse> {
 		// Hash password
 		const hashedPassword = await bcrypt.hash(validated.password, 10);
 
-		// Create user
+		// Create user with active status (admin-created users bypass approval)
 		const result = await pool.query(
 			`INSERT INTO Users (name, email, password, role, department_id) 
        VALUES ($1, $2, $3, $4, $5) 
@@ -149,11 +150,33 @@ export async function createUser(formData: FormData): Promise<ActionResponse> {
 			]
 		);
 
+		const newUserId = result.rows[0].user_id;
+
+		// Also create Better Auth user entry with active status
+		// This ensures the user can login immediately
+		const betterAuthPool = (await import("@/lib/db")).default;
+		await betterAuthPool.query(
+			`INSERT INTO "user" (id, email, name, "emailVerified", image, "createdAt", "updatedAt", role, department, status, approved_by)
+			 VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $6, $7, 'active', $8)
+			 ON CONFLICT (email) DO UPDATE 
+			 SET status = 'active', approved_by = $8, role = $6`,
+			[
+				newUserId.toString(),
+				validated.email,
+				validated.name,
+				false,
+				null,
+				validated.role,
+				validated.departmentId || null,
+				session.userId, // Admin who created the user
+			]
+		);
+
 		revalidatePath("/users");
 
 		return {
 			success: true,
-			data: { userId: result.rows[0].user_id },
+			data: { userId: newUserId },
 		};
 	} catch (error) {
 		if (error instanceof z.ZodError) {
@@ -262,10 +285,10 @@ export async function deleteUser(userId: string): Promise<ActionResponse> {
 			return { error: "Unauthorized" };
 		}
 
-		// Check if user is admin
+		// Check if user is admin using Better Auth user table
 		const userCheck = await pool.query(
-			"SELECT role FROM Users WHERE user_id = $1",
-			[parseInt(session.userId) || session.userId]
+			'SELECT role FROM "user" WHERE id = $1',
+			[session.userId]
 		);
 
 		if (!userCheck.rows[0] || userCheck.rows[0].role !== "admin") {
@@ -273,13 +296,22 @@ export async function deleteUser(userId: string): Promise<ActionResponse> {
 		}
 
 		// Prevent self-deletion
-		const sessionUserId = parseInt(session.userId) || session.userId;
-		const targetUserId = parseInt(userId) || userId;
-		if (sessionUserId === targetUserId) {
+		if (session.userId === userId) {
 			return { error: "You cannot delete your own account" };
 		}
 
-		await pool.query("DELETE FROM Users WHERE user_id = $1", [targetUserId]);
+		// Delete from Better Auth tables (cascading will handle sessions)
+		// Delete account records first
+		await pool.query('DELETE FROM "account" WHERE "userId" = $1', [userId]);
+
+		// Delete session records
+		await pool.query('DELETE FROM "session" WHERE "userId" = $1', [userId]);
+
+		// Delete verification records
+		await pool.query('DELETE FROM "verification" WHERE identifier IN (SELECT email FROM "user" WHERE id = $1)', [userId]);
+
+		// Finally delete the user
+		await pool.query('DELETE FROM "user" WHERE id = $1', [userId]);
 
 		revalidatePath("/users");
 

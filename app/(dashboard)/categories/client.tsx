@@ -144,11 +144,11 @@ const CategoriesClient = ({ categories, stats, userRole }: CategoriesClientProps
     const avgPerCategory = categories.length > 0 ? Math.round(totalDocuments / categories.length) : 0;
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="space-y-6 animate-in fade-in duration-500 cyber-grid min-h-screen p-6">
             {/* Page Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                    <h1 className="text-3xl font-bold tracking-tight text-cyan-900 dark:text-cyan-100">
                         Document Categories
                     </h1>
                     <p className="text-muted-foreground mt-1">
@@ -158,7 +158,7 @@ const CategoriesClient = ({ categories, stats, userRole }: CategoriesClientProps
                 {userRole === "admin" && (
                     <Button
                         onClick={() => setIsCreateOpen(true)}
-                        className="gap-2 shadow-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 hover:shadow-xl hover:scale-105"
+                        className="gap-2 shadow-lg bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 transition-all duration-300 hover:shadow-cyan-500/50 hover:scale-105 border border-cyan-500/30"
                     >
                         <Plus className="h-4 w-4" />
                         New Category
@@ -168,7 +168,7 @@ const CategoriesClient = ({ categories, stats, userRole }: CategoriesClientProps
 
             {/* Stats Overview */}
             <div className="grid gap-4 md:grid-cols-3">
-                <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-2 border-blue-200/50 dark:border-blue-800/50 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <Card className="bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-cyan hover:neon-glow-cyan transition-all hover:-translate-y-1">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
@@ -182,7 +182,7 @@ const CategoriesClient = ({ categories, stats, userRole }: CategoriesClientProps
                     </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-2 border-green-200/50 dark:border-green-800/50 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <Card className="bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-purple hover:neon-glow-purple transition-all hover:-translate-y-1">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
@@ -196,7 +196,7 @@ const CategoriesClient = ({ categories, stats, userRole }: CategoriesClientProps
                     </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-200/50 dark:border-amber-800/50 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <Card className="bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-pink hover:neon-glow-pink transition-all hover:-translate-y-1">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
@@ -219,7 +219,7 @@ const CategoriesClient = ({ categories, stats, userRole }: CategoriesClientProps
                     return (
                         <Card
                             key={category.category_id}
-                            className="transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-card/95 backdrop-blur-sm border shadow-lg group"
+                            className="transition-all duration-300 ease-in-out hover:-translate-y-1 bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-magenta hover:neon-glow-magenta group"
                             style={{ animationDelay: `${index * 50}ms` }}
                         >
                             <CardContent className="p-6">

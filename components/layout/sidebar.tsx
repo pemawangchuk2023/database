@@ -84,7 +84,7 @@ const Sidebar = () => {
 									key={item.name}
 									href={item.href}
 									className={cn(
-										"flex items-center uppercase gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200",
+										"flex items-center uppercase font-bold gap-3 rounded-xl px-3 py-3 text-sm transition-all duration-200",
 										isActive
 											? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 scale-105"
 											: "text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-900/20 dark:hover:to-indigo-900/20 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-102",

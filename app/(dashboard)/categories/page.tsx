@@ -1,6 +1,6 @@
 import { getCategories } from "@/actions/category.action";
 import { getDocumentStats } from "@/actions/document.action";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/actions/auth";
 import CategoriesClient from "./client";
 
 const Categories = async () => {

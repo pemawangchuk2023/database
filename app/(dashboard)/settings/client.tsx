@@ -72,7 +72,7 @@ const SettingsClient = ({ user, logs }: SettingsClientProps) => {
 	}
 
 	return (
-		<div className='max-w-4xl space-y-6 animate-in fade-in duration-500'>
+		<div className='w-full space-y-6 animate-in fade-in duration-500 cyber-grid min-h-screen p-6'>
 			<div>
 				<h1 className='text-3xl font-bold tracking-tight'>Settings</h1>
 				<p className='text-muted-foreground mt-1'>
@@ -95,7 +95,7 @@ const SettingsClient = ({ user, logs }: SettingsClientProps) => {
 
 				{/* Profile Tab */}
 				<TabsContent value='profile'>
-					<Card className='rounded-none border-2'>
+					<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-cyan hover:neon-glow-cyan'>
 						<CardHeader>
 							<CardTitle>Profile Information</CardTitle>
 							<CardDescription>Update your personal details</CardDescription>
@@ -160,7 +160,7 @@ const SettingsClient = ({ user, logs }: SettingsClientProps) => {
 
 				{/* Security Tab */}
 				<TabsContent value='security'>
-					<Card className='rounded-none border-2'>
+					<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-purple hover:neon-glow-purple'>
 						<CardHeader>
 							<CardTitle>Security Settings</CardTitle>
 							<CardDescription>
@@ -222,7 +222,7 @@ const SettingsClient = ({ user, logs }: SettingsClientProps) => {
 
 				{/* Activity Tab */}
 				<TabsContent value='activity'>
-					<Card className='rounded-none border-2'>
+					<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-magenta hover:neon-glow-magenta'>
 						<CardHeader>
 							<CardTitle className="text-center items-center justify-center text-amber-500">Activity Log</CardTitle>
 							<CardDescription>Recent activity on your account</CardDescription>

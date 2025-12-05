@@ -161,7 +161,7 @@ const DocumentsClient = ({
 	};
 
 	return (
-		<div className='space-y-6 animate-in fade-in duration-500'>
+		<div className='space-y-6 animate-in fade-in duration-500 cyber-grid min-h-screen p-6'>
 			{/* Page Header */}
 			<div className='flex items-center justify-between'>
 				<div>
@@ -171,7 +171,7 @@ const DocumentsClient = ({
 					</p>
 				</div>
 				<Link href='/documents/upload'>
-					<Button className='gap-2 shadow-lg rounded-none cursor-pointer'>
+					<Button className='gap-2 shadow-lg bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 transition-all duration-300 hover:shadow-cyan-500/50 hover:scale-105 border border-cyan-500/30'>
 						<FileText className='h-4 w-4' />
 						Upload New
 					</Button>
@@ -179,7 +179,7 @@ const DocumentsClient = ({
 			</div>
 
 			{/* Filters */}
-			<Card className='bg-card/95 backdrop-blur-sm border shadow-lg'>
+			<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 border-cyan-500/30 neon-glow-cyan'>
 				<CardContent className='p-4'>
 					<div className='flex flex-col gap-4 md:flex-row md:items-center'>
 						<div className='flex-1'>
@@ -236,7 +236,7 @@ const DocumentsClient = ({
 
 			{/* Empty State */}
 			{filteredDocuments.length === 0 && (
-				<Card className='bg-card/95 backdrop-blur-sm border shadow-lg'>
+				<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 border-purple-500/30 neon-glow-purple'>
 					<CardContent className='p-12 text-center'>
 						<FileText className='h-12 w-12 mx-auto mb-4 text-muted-foreground' />
 						<h3 className='text-lg font-semibold mb-2'>No documents found</h3>
@@ -258,7 +258,7 @@ const DocumentsClient = ({
 					{paginatedDocuments.map((doc, index) => (
 						<Card
 							key={doc.document_id}
-							className='transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-card/95 backdrop-blur-sm border shadow-lg cursor-pointer group'
+							className='transition-all duration-300 ease-in-out hover:-translate-y-1 bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 neon-border-magenta hover:neon-glow-magenta cursor-pointer group'
 							style={{ animationDelay: `${index * 50}ms` }}
 							onClick={() => handleDocumentClick(doc.document_id)}
 						>
@@ -370,7 +370,7 @@ const DocumentsClient = ({
 
 			{/* Documents List View */}
 			{viewMode === "list" && filteredDocuments.length > 0 && (
-				<Card className='bg-card/95 backdrop-blur-sm border shadow-lg'>
+				<Card className='bg-white/80 dark:bg-black/40 backdrop-blur-sm border-2 border-purple-500/30 neon-glow-purple'>
 					<Table>
 						<TableHeader>
 							<TableRow>

@@ -3,13 +3,10 @@ import {
     Field,
     FieldGroup,
     FieldLabel,
-    FieldDescription,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { login as loginAction } from "@/actions/auth";
 import z from "zod"
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -27,8 +24,7 @@ const formSchema = z.object({
     }),
 });
 
-export default function LoginPage() {
-    const router = useRouter();
+const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const {
@@ -43,21 +39,40 @@ export default function LoginPage() {
         },
     });
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setIsLoading(true);
+        try {
+            // First check status on server
+            const statusCheck = await fetch('/api/check-user-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: values.email }),
+            });
 
-        const formData = new FormData();
-        formData.append("email", values.email);
-        formData.append("password", values.password);
+            const statusData = await statusCheck.json();
 
-        const result = await loginAction({} as any, formData);
+            if (statusData.error) {
+                toast.error(statusData.error);
+                setIsLoading(false);
+                return;
+            }
 
-        if (result.success) {
-            toast.success("Logged in successfully");
-            router.push("/dashboard");
-            router.refresh();
-        } else {
-            toast.error(result.error || "Invalid email or password");
+            // Status is active, now use Better Auth client to login
+            const { authClient } = await import("@/lib/auth-client");
+            const result = await authClient.signIn.email({
+                email: values.email,
+                password: values.password,
+            });
+
+            if (result.error) {
+                toast.error(result.error.message || "Invalid email or password");
+                setIsLoading(false);
+            } else {
+                toast.success("Logged in successfully");
+                window.location.href = "/dashboard";
+            }
+        } catch (error: any) {
+            toast.error(error.message || "Invalid email or password");
             setIsLoading(false);
         }
     }
@@ -144,7 +159,13 @@ export default function LoginPage() {
                         </Link>
                     </div>
                 </CardFooter>
+                <Link href="/" className="text-center justify-center">
+                    <Button className="w-fit cursor-pointer" variant="destructive">Back to Home</Button>
+                </Link>
             </Card>
         </div>
     );
 }
+
+
+export default Login
