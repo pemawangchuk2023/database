@@ -14,6 +14,12 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: false,
+        sendResetPassword: async ({ user, url }) => {
+            // In production, you would send an email here
+            // For this implementation, we'll store the URL for display
+            console.log(`Password reset for ${user.email}: ${url}`);
+            // The URL will be returned to the client via the API response
+        },
     },
     user: {
         additionalFields: {

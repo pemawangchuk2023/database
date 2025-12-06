@@ -21,8 +21,8 @@ export async function checkDocumentPermission(
         d.uploaded_by,
         u.role
       FROM Documents d
-      CROSS JOIN Users u
-      WHERE d.document_id = $1 AND u.user_id = $2`,
+      CROSS JOIN "user" u
+      WHERE d.document_id = $1 AND u.id = $2`,
       [documentId, userId]
     );
 
@@ -36,7 +36,7 @@ export async function checkDocumentPermission(
     }
 
     const { uploaded_by, role } = result.rows[0];
-    const isOwner = uploaded_by === parseInt(userId);
+    const isOwner = uploaded_by === userId;
     const isAdmin = role === "admin";
 
     return {

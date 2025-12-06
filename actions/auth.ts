@@ -1,13 +1,157 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { parseError } from "@/lib/errors";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export type AuthState = {
     error?: string;
     success?: boolean;
+    data?: unknown;
 };
+
+/**
+ * Request password reset using Better Auth
+ */
+export async function requestPasswordReset(prevState: AuthState, formData: FormData): Promise<AuthState> {
+    try {
+        const email = formData.get("email") as string;
+
+        if (!email || !email.includes("@")) {
+            return { error: "Invalid email address" };
+        }
+
+        const pool = (await import("@/lib/db")).default;
+
+        // Check if user exists
+        const userCheck = await pool.query(
+            `SELECT id FROM "user" WHERE email = $1`,
+            [email]
+        );
+
+        if (userCheck.rows.length === 0) {
+            // Return success even if user not found to prevent enumeration
+            return {
+                success: true,
+                data: {
+                    message: "If an account exists with this email, you will receive a password reset link."
+                }
+            };
+        }
+
+        // Generate token
+        const token = crypto.randomUUID();
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+        // Store in verification table
+        await pool.query(
+            `INSERT INTO "verification" (id, identifier, value, "expiresAt", "createdAt", "updatedAt")
+             VALUES ($1, $2, $3, $4, NOW(), NOW())`,
+            [crypto.randomUUID(), email, token, expiresAt]
+        );
+
+        const resetLink = `${process.env.BETTER_AUTH_URL || "http://localhost:3000"}/auth/reset-password?token=${token}`;
+        
+        return {
+            success: true,
+            data: { resetLink }
+        };
+    } catch (error) {
+        console.error("Request password reset error:", error);
+        return { error: "Something went wrong. Please try again." };
+    }
+}
+
+/**
+ * Reset password using Better Auth
+ */
+export async function resetPassword(prevState: AuthState, formData: FormData): Promise<AuthState> {
+    try {
+        const token = formData.get("token") as string;
+        const password = formData.get("password") as string;
+        const confirmPassword = formData.get("confirmPassword") as string;
+
+        if (!password || password.length < 8) {
+            return { error: "Password must be at least 8 characters" };
+        }
+
+        if (password !== confirmPassword) {
+            return { error: "Passwords do not match" };
+        }
+
+        const pool = (await import("@/lib/db")).default;
+
+        // Verify token
+        const tokenCheck = await pool.query(
+            `SELECT * FROM "verification" WHERE value = $1 AND "expiresAt" > NOW()`,
+            [token]
+        );
+
+        if (tokenCheck.rows.length === 0) {
+            return { error: "Invalid or expired token" };
+        }
+
+        const email = tokenCheck.rows[0].identifier;
+
+        // Get user ID
+        const userCheck = await pool.query(
+            `SELECT id FROM "user" WHERE email = $1`,
+            [email]
+        );
+
+        if (userCheck.rows.length === 0) {
+            return { error: "User not found" };
+        }
+
+        const userId = userCheck.rows[0].id;
+
+        // Import Better Auth's crypto module to hash password correctly
+        const { hashPassword } = await import("better-auth/crypto");
+        const hashedPassword = await hashPassword(password);
+
+        // Update password in account table
+        await pool.query(
+            `UPDATE "account" 
+             SET password = $1, "updatedAt" = NOW()
+             WHERE "userId" = $2 AND "providerId" = 'credential'`,
+            [hashedPassword, userId]
+        );
+
+        // Delete used token
+        await pool.query(
+            `DELETE FROM "verification" WHERE value = $1`,
+            [token]
+        );
+
+        return { success: true };
+    } catch (error) {
+        console.error("Reset password error:", error);
+        return { error: "Failed to reset password. The link may have expired." };
+    }
+}
+
+/**
+ * Validate reset token
+ */
+export async function validateResetToken(token: string): Promise<{ valid: boolean; error?: string }> {
+    try {
+        const pool = (await import("@/lib/db")).default;
+        const result = await pool.query(
+            `SELECT * FROM "verification" WHERE value = $1 AND "expiresAt" > NOW()`,
+            [token]
+        );
+
+        if (result.rows.length === 0) {
+            return { valid: false, error: "Invalid or expired token" };
+        }
+
+        return { valid: true };
+    } catch (error) {
+        console.error("Validate token error:", error);
+        return { valid: false, error: "Failed to validate token" };
+    }
+}
 
 /**
  * Register a new user using Better Auth
@@ -60,14 +204,15 @@ export async function register(prevState: AuthState, formData: FormData): Promis
         });
 
         return { success: true };
-    } catch (error: any) {
+    } catch (error) {
+        const message = parseError(error);
         console.error("Registration error:", error);
 
-        if (error.message?.includes("already exists") || error.message?.includes("unique") || error.message?.includes("duplicate")) {
+        if (message.includes("already exists") || message.includes("unique") || message.includes("duplicate")) {
             return { error: "User already exists with this email" };
         }
 
-        return { error: error.message || "Something went wrong. Please try again." };
+        return { error: message || "Something went wrong. Please try again." };
     }
 }
 
@@ -122,9 +267,9 @@ export async function login(prevState: AuthState, formData: FormData): Promise<A
         }
 
         return { success: true };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Login error:", error);
-        return { error: "Invalid email or password" };
+        return { error: parseError(error) };
     }
 }
 
@@ -200,9 +345,9 @@ export async function getPendingUsers(): Promise<ActionResponse> {
             success: true,
             data: result.rows,
         };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Get pending users error:", error);
-        return { error: "Failed to fetch pending users" };
+        return { error: parseError(error) };
     }
 }
 
@@ -246,9 +391,9 @@ export async function approveUser(userId: string): Promise<ActionResponse> {
             success: true,
             data: result.rows[0],
         };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Approve user error:", error);
-        return { error: "Failed to approve user" };
+        return { error: parseError(error) };
     }
 }
 
@@ -292,14 +437,14 @@ export async function rejectUser(userId: string): Promise<ActionResponse> {
             success: true,
             data: result.rows[0],
         };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Reject user error:", error);
-        return { error: "Failed to reject user" };
+        return { error: parseError(error) };
     }
 }
 
 type ActionResponse = {
     success?: boolean;
     error?: string;
-    data?: any;
+    data?: unknown;
 };

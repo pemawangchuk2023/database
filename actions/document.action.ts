@@ -209,7 +209,7 @@ export async function getDocuments(filters?: {
         u.email as uploader_email,
         c.name as category_name
       FROM Documents d
-      LEFT JOIN Users u ON d.uploaded_by = u.user_id
+      LEFT JOIN "user" u ON d.uploaded_by = u.id
       LEFT JOIN Categories c ON d.category_id = c.category_id
       ${whereClause}
       ORDER BY d.created_at DESC
@@ -524,7 +524,7 @@ export async function getDocumentById(id: string): Promise<ActionResponse> {
         u.email as uploader_email,
         c.name as category_name
       FROM Documents d
-      LEFT JOIN Users u ON d.uploaded_by = u.user_id
+      LEFT JOIN "user" u ON d.uploaded_by = u.id
       LEFT JOIN Categories c ON d.category_id = c.category_id
       WHERE d.document_id = $1`,
 			[id]
@@ -586,7 +586,7 @@ export async function getPendingDocuments(): Promise<ActionResponse> {
 				u.email as uploader_email,
 				c.name as category_name
 			FROM Documents d
-			LEFT JOIN Users u ON d.uploaded_by = u.user_id
+			LEFT JOIN "user" u ON d.uploaded_by = u.id
 			LEFT JOIN Categories c ON d.category_id = c.category_id
 			WHERE d.status = 'pending' OR d.status IS NULL
 			ORDER BY d.created_at DESC
